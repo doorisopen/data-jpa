@@ -306,7 +306,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    public void queryHint() throws Exception {
+    public void queryHint() throws Exception  {
         //given
         Member member1 = new Member("member1", 10);
         memberRepository.save(member1);
@@ -314,7 +314,7 @@ class MemberRepositoryTest {
         em.clear();
 
         //when
-        Member findMember = memberRepository.findById(member1.getId()).get();// 실무에서 get() 금지
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");// 실무에서 get() 금지
         findMember.setUsername("member2");
 
         em.flush();
@@ -334,5 +334,10 @@ class MemberRepositoryTest {
         List<Member> member = memberRepository.findLockByUsername("member1");
 
         //then
+    }
+
+    @Test
+    public void callCustom() throws Exception {
+        List<Member> result = memberRepository.findMemberCustom();
     }
 }

@@ -13,7 +13,7 @@ import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
 
@@ -71,7 +71,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     //JPA Hint : Member 를 조회만 하겠다고 하이버네이트에 말하는것임 -> 최적화
     @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
-    Member findReadOnlyUsername(String username);
+    Member findReadOnlyByUsername(String username);
 
     //JPA lock
     @Lock(LockModeType.PESSIMISTIC_WRITE) // db 에서 select for update 처럼 건들지 못하게 락 건다.
