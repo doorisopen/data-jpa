@@ -340,4 +340,74 @@ class MemberRepositoryTest {
     public void callCustom() throws Exception {
         List<Member> result = memberRepository.findMemberCustom();
     }
+
+    @Test
+    public void projections() throws Exception {
+        //given
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1", 10);
+        Member m2 = new Member("m2", 20);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
+        //when
+
+        //interface 기반 projection - 프록시 사용
+        List<UsernameOnly> result1 = memberRepository.findInterfaceProjectionsByUsername("m1");
+
+        for (UsernameOnly usernameOnly : result1) {
+            System.out.println("usernameOnly= " + usernameOnly);
+        }
+
+        System.out.println("==================");
+
+        //class 기반 projection
+        List<UsernameOnlyDto> result2 = memberRepository.findClassProjectionsByUsername("m1");
+
+        for (UsernameOnlyDto usernameOnlyDto : result2) {
+            System.out.println("usernameOnlyDto= " + usernameOnlyDto);
+        }
+
+        System.out.println("==================");
+
+        //동적 projection
+        List<NestedClosedProjections> result3 = memberRepository.findProjectionsByUsername("m1", NestedClosedProjections.class);
+
+        for (NestedClosedProjections nestedClosedProjections : result3) {
+            System.out.println("nestedClosedProjections= " + nestedClosedProjections);
+        }
+        //then
+    }
+
+    @Test
+    public void nativeQuery() throws Exception {
+        //given
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1", 10);
+        Member m2 = new Member("m2", 20);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
+
+        //when
+        Member result1 = memberRepository.findByNativeQuery("m1");
+        System.out.println(result1);
+
+        //native projection
+        Page<MemberProjection> result2 = memberRepository.findByNativeProjection(PageRequest.of(0, 10));
+        List<MemberProjection> content = result2.getContent();
+        for (MemberProjection memberProjection : content) {
+            System.out.println("memberPro = " + memberProjection.getUsername());
+            System.out.println("memberPro = " + memberProjection.getTeamName());
+        }
+        //then
+    }
 }
